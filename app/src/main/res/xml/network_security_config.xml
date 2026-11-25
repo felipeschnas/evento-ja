@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    A API roda localmente em HTTP (sem HTTPS). A partir do Android 9 o trafego
+    sem criptografia e bloqueado por padrao, entao liberamos aqui para o
+    ambiente de desenvolvimento (emulador ou celular na mesma rede).
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
