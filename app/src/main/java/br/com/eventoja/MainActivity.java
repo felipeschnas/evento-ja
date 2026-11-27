@@ -2,6 +2,8 @@ package br.com.eventoja;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -12,13 +14,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.eventoja.data.model.Evento;
+import br.com.eventoja.data.model.Usuario;
 import br.com.eventoja.viewmodel.EventoViewModel;
 import br.com.eventoja.viewmodel.LoginViewModel;
 import br.com.eventoja.viewmodel.Resultado;
@@ -37,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.app_name);
+        setTitle(R.string.app_name);
 
         progress = findViewById(R.id.progress);
         textoStatus = findViewById(R.id.texto_status);
@@ -57,41 +58,55 @@ public class MainActivity extends AppCompatActivity {
         botaoNovo.setOnClickListener(v ->
                 startActivity(new Intent(this, FormularioEventoActivity.class)));
 
-        toolbar.inflateMenu(R.menu.menu_principal);
-        toolbar.setOnMenuItemClickListener(item -> {
-            if (item.getItemId() == R.id.acao_login) {
-                startActivity(new Intent(this, LoginActivity.class));
-                return true;
-            }
-            if (item.getItemId() == R.id.acao_sair) {
-                loginViewModel.sair();
-                atualizarPermissoes();
-                Toast.makeText(this, R.string.user_logged_out, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_principal, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.acao_sair) {
+            loginViewModel.sair();
+            Toast.makeText(this, R.string.user_logged_out, Toast.LENGTH_SHORT).show();
+            voltarParaLogin();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // A lista só pode ser vista por quem fez login
+        if (!loginViewModel.isLogado()) {
+            voltarParaLogin();
+            return;
+        }
         atualizarPermissoes();
-        if (eventoViewModel != null) {
-            eventoViewModel.carregarEventos();
+        eventoViewModel.carregarEventos();
+    }
+
+    /** Mostra quem está logado e libera o botão de novo evento só para o admin. */
+    private void atualizarPermissoes() {
+        boolean admin = loginViewModel.isAdmin();
+        botaoNovo.setVisibility(admin ? View.VISIBLE : View.GONE);
+
+        Usuario usuario = loginViewModel.getUsuarioLogado();
+        String nome = usuario == null || usuario.getLogin() == null ? "" : usuario.getLogin();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setSubtitle(
+                    getString(admin ? R.string.logged_as_admin : R.string.logged_as_user, nome));
         }
     }
 
-    private void atualizarPermissoes() {
-        boolean logado = loginViewModel != null && loginViewModel.isLogado();
-        boolean admin = loginViewModel != null && loginViewModel.isAdmin();
-        botaoNovo.setVisibility(admin ? View.VISIBLE : View.GONE);
-
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.getMenu().clear();
-        toolbar.inflateMenu(R.menu.menu_principal);
-        toolbar.getMenu().findItem(R.id.acao_login).setVisible(!logado);
-        toolbar.getMenu().findItem(R.id.acao_sair).setVisible(logado);
+    private void voltarParaLogin() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void mostrarEventos(Resultado<List<Evento>> resultado) {
@@ -105,7 +120,12 @@ public class MainActivity extends AppCompatActivity {
                 textoStatus.setVisibility(View.GONE);
             }
         } else if (resultado.isErro()) {
-            atualizarPermissoes();
+            // Token expirou (API respondeu 401): a sessão foi limpa, então volta para o login
+            if (!loginViewModel.isLogado()) {
+                Toast.makeText(this, resultado.getMensagem(), Toast.LENGTH_LONG).show();
+                voltarParaLogin();
+                return;
+            }
             textoStatus.setVisibility(View.VISIBLE);
             textoStatus.setText(resultado.getMensagem());
         }

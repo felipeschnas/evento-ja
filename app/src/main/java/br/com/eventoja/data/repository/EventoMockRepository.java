@@ -28,12 +28,18 @@ public class EventoMockRepository implements EventoRepository {
 
     @Override
     public void listar(RepositorioCallback<List<Evento>> callback) {
-        executor.executar(this::copiarTodos, callback);
+        executor.executar(() -> {
+            verificarLogado();
+            return copiarTodos();
+        }, callback);
     }
 
     @Override
     public void buscar(long id, RepositorioCallback<Evento> callback) {
-        executor.executar(() -> copiar(encontrar(id)), callback);
+        executor.executar(() -> {
+            verificarLogado();
+            return copiar(encontrar(id));
+        }, callback);
     }
 
     @Override
@@ -98,10 +104,14 @@ public class EventoMockRepository implements EventoRepository {
         return copia;
     }
 
-    private void verificarAdmin() throws ExecutorMock.ErroMock {
+    private void verificarLogado() throws ExecutorMock.ErroMock {
         if (!sessao.isLogado()) {
             throw new ExecutorMock.ErroMock("Você precisa fazer login para continuar.");
         }
+    }
+
+    private void verificarAdmin() throws ExecutorMock.ErroMock {
+        verificarLogado();
         if (!sessao.isAdmin()) {
             throw new ExecutorMock.ErroMock("Apenas administradores podem fazer isso.");
         }

@@ -10,10 +10,12 @@
     <string name="events_subheading">Ideias para curtir a cidade, perto de você.</string>
     <string name="no_events">Nenhum evento encontrado por enquanto.</string>
     <string name="login_heading">Entre para continuar</string>
-    <string name="login_subheading">Acesse sua conta para gerenciar eventos.</string>
-    <string name="login_field">Login</string>
+    <string name="login_subheading">Acesse sua conta para ver os eventos da cidade.</string>
+    <string name="login_field">Usuário</string>
     <string name="password_field">Senha</string>
-    <string name="login_welcome">Bem-vindo!</string>
+    <string name="login_welcome">Bem-vindo, %1$s!</string>
+    <string name="logged_as_admin">%1$s · Administrador</string>
+    <string name="logged_as_user">%1$s · Usuário</string>
     <string name="event_details_title">Detalhes do evento</string>
     <string name="event_create_title">Novo evento</string>
     <string name="event_edit_title">Editar evento</string>

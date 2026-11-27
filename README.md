@@ -5,8 +5,22 @@ App Android nativo (Java) que consome a API REST de eventos feita em Spring Boot
 
 ## Como rodar
 
+Precisa do JDK 17 (Temurin 17). O Gradle 8.11 deste projeto não roda com o JDK 25
+que vem no Android Studio novo; no Android Studio, em *Settings > Build Tools > Gradle >
+Gradle JDK*, escolha o JDK 17.
+
 1. Suba a API (ver README do `api-tra-mobile`). Ela fica em `http://localhost:8080`.
-2. Abra esta pasta no Android Studio e rode o app no emulador.
+2. Abra esta pasta no Android Studio e rode o app no emulador,
+   ou pelo PowerShell: `.\rodar-app.ps1` (compila, abre o emulador, instala e abre o app).
+
+O app abre na **tela de login**. Usuários:
+
+| Usuário   | Senha     | O que pode fazer                         |
+|-----------|-----------|------------------------------------------|
+| `admin`   | `admin`   | ver, cadastrar, editar e excluir eventos |
+| `usuario` | `usuario` | só ver os eventos                        |
+
+O login fica salvo; para trocar de usuário use **Sair** no menu da lista de eventos.
 
 No emulador o endereço da API é `http://10.0.2.2:8080/` (já é o padrão).
 
@@ -98,8 +112,10 @@ viewModel.excluirEvento(evento.getId()); // a lista é recarregada sozinha
 
 ### Login
 
-Criar, editar e excluir só funcionam com um usuário admin logado
-(`admin` / `admin123`). O usuário `joao` / `123` só consegue ver os eventos.
+Sem login não dá para ver nada: o app abre na `LoginActivity`, e a `MainActivity`
+volta para o login se a sessão acabar. Criar, editar e excluir só funcionam com um
+usuário admin logado (`admin` / `admin`). O usuário `usuario` / `usuario` só consegue
+ver os eventos.
 
 ```java
 LoginViewModel loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);

@@ -2,12 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/acao_login"
-        android:title="@string/login"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/acao_sair"
         android:title="@string/logout"
-        android:visible="false"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>
