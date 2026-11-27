@@ -29,6 +29,13 @@ public class LoginViewModel extends AndroidViewModel {
     }
 
     public void entrar(String login, String senha) {
+        // Evita mandar dois logins ao mesmo tempo (ex.: "Concluído" do teclado + toque no botão).
+        // Cada login gera um token novo na API, e o app poderia ficar com o token antigo.
+        Resultado<Usuario> atual = resultadoLogin.getValue();
+        if (atual != null && (atual.isCarregando() || atual.isSucesso())) {
+            return;
+        }
+
         if (login == null || login.trim().isEmpty() || senha == null || senha.isEmpty()) {
             resultadoLogin.setValue(Resultado.erro("Informe o login e a senha."));
             return;
