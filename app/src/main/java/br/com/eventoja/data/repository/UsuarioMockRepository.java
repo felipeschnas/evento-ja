@@ -7,7 +7,7 @@ import java.util.UUID;
 import br.com.eventoja.data.local.SessaoUsuario;
 import br.com.eventoja.data.model.Usuario;
 
-/** Login de exemplo com os mesmos usuários da API (admin/admin123 e joao/123). */
+/** Login de exemplo com os mesmos usuários da API (admin/admin e usuario/usuario). */
 public class UsuarioMockRepository implements UsuarioRepository {
 
     private final ExecutorMock executor = new ExecutorMock();
@@ -28,11 +28,11 @@ public class UsuarioMockRepository implements UsuarioRepository {
 
     private Usuario autenticar(String login, String senha) throws ExecutorMock.ErroMock {
         String token = UUID.randomUUID().toString();
-        if ("admin".equals(login) && "admin123".equals(senha)) {
+        if ("admin".equals(login) && "admin".equals(senha)) {
             return new Usuario(1L, "Administrador", "admin", true, token);
         }
-        if ("joao".equals(login) && "123".equals(senha)) {
-            return new Usuario(2L, "Joao", "joao", false, token);
+        if ("usuario".equals(login) && "usuario".equals(senha)) {
+            return new Usuario(2L, "Usuario", "usuario", false, token);
         }
         throw new ExecutorMock.ErroMock("Login ou senha invalidos");
     }
